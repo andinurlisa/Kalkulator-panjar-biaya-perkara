@@ -2,18 +2,15 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<!-- Google Analytics 4 -->
+<!-- Google tag (gtag.js) — Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LLW26X6ZT7"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-LLW26X6ZT7');
 </script>
-<!-- End Google Analytics 4 -->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Kalkulator Panjar Biaya Perkara – PN Baubau</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet"/>
@@ -172,11 +169,6 @@ body{font-family:var(--font-b);background:var(--cream);color:var(--text);min-hei
 .vs-sh div h4{font-family:var(--font-d);font-size:.86rem;font-weight:600;}
 .vs-sh div p{font-size:.66rem;opacity:.6;margin-top:1px;}
 .vs-body{padding:13px 15px;}
-.vs-row{display:flex;gap:9px;}
-.vs-item{flex:1;text-align:center;padding:11px 6px;background:var(--gray-1);border-radius:var(--r);}
-.vs-num{font-family:var(--font-d);font-size:1.35rem;font-weight:700;color:var(--navy);line-height:1.1;}
-.vs-lbl{font-size:.6rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gray-3);margin-top:4px;}
-.vs-period{font-size:.68rem;color:var(--gray-4);margin-top:9px;text-align:center;}
 .vs-note{font-size:.62rem;color:var(--gray-3);margin-top:7px;text-align:center;line-height:1.5;}
 
 /* ── RESULT ── */
@@ -392,14 +384,11 @@ body{font-family:var(--font-b);background:var(--cream);color:var(--text);min-hei
 
       <!-- VISITOR STATS CARD -->
       <div class="card">
-        <div class="vs-sh"><span class="vsi">📊</span><div><h4>Statistik Kunjungan</h4><p>Aplikasi Kalkulator Panjar</p></div></div>
+        <div class="vs-sh"><span class="vsi">📊</span><div><h4>Statistik Kunjungan</h4><p>Google Analytics aktif</p></div></div>
         <div class="vs-body">
-          <div class="vs-row">
-            <div class="vs-item"><div class="vs-num" id="vc-month">—</div><div class="vs-lbl">Bulan Ini</div></div>
-            <div class="vs-item"><div class="vs-num" id="vc-year">—</div><div class="vs-lbl">Tahun Ini</div></div>
-          </div>
-          <div class="vs-period" id="vs-period">Memuat data...</div>
-          <div class="vs-note">Jumlah kunjungan (setiap halaman dimuat), bukan pengunjung unik.</div>
+          <div class="ib-green" style="margin-bottom:0;">✅ Pelacakan kunjungan aktif via Google Analytics 4.</div>
+          <div class="vs-note" style="text-align:left;margin-top:9px;">Untuk melihat jumlah kunjungan bulan ini, tahun ini, dan statistik lengkap lainnya, buka dashboard Google Analytics (perlu login dengan akun yang terdaftar).</div>
+          <a href="https://analytics.google.com/" target="_blank" rel="noopener" class="btn-sec" style="display:block;text-align:center;text-decoration:none;margin-top:11px;">📈 Buka Dashboard Analytics</a>
         </div>
       </div>
     </div>
@@ -764,36 +753,12 @@ function nb(step,last=false){return `<div class="nb"><button class="bn prev" onc
 function reset(){Object.assign(S,{step:1,pk:null,mt:'ecourt',nPG:1,nTG:1,nPM:1,nTM:1,tgs:[],tms:[],psR:'I',psX:0,exT:'riil'});rPKGrid();sM('ecourt');rSum();gS(1);}
 
 /* ══ STATISTIK KUNJUNGAN ══ */
-/* Menggunakan CountAPI (api.countapi.xyz) — layanan counter gratis pihak ketiga,
-   dipilih karena aplikasi ini adalah file HTML statis tanpa server/database sendiri.
-   Kunci (key) dibuat otomatis mengikuti bulan & tahun berjalan, sehingga statistik
-   "bulan ini" dan "tahun ini" selalu mengacu ke periode saat halaman dibuka. */
-async function trackVisit(){
-  const elMonth=document.getElementById('vc-month');
-  const elYear=document.getElementById('vc-year');
-  const elPeriod=document.getElementById('vs-period');
-  const NS='pnbaubau-w23u2-kalkulator-panjar'; // namespace unik aplikasi ini
-  try{
-    const now=new Date();
-    const yyyy=now.getFullYear();
-    const mm=String(now.getMonth()+1).padStart(2,'0');
-    const [rYear,rMonth]=await Promise.all([
-      fetch(`https://api.countapi.xyz/hit/${NS}/tahun-${yyyy}`).then(r=>r.json()),
-      fetch(`https://api.countapi.xyz/hit/${NS}/bulan-${yyyy}-${mm}`).then(r=>r.json())
-    ]);
-    elMonth.textContent=(rMonth.value||0).toLocaleString('id-ID');
-    elYear.textContent=(rYear.value||0).toLocaleString('id-ID');
-    elPeriod.textContent=now.toLocaleDateString('id-ID',{month:'long',year:'numeric'})+' • Tahun '+yyyy;
-  }catch(e){
-    elMonth.textContent='N/A';
-    elYear.textContent='N/A';
-    elPeriod.textContent='Statistik tidak tersedia (periksa koneksi internet)';
-  }
-}
+/* Pelacakan kunjungan kini ditangani otomatis oleh Google Analytics 4 (GA4)
+   lewat kode gtag.js di bagian <head>. Tidak perlu kode tambahan di sini —
+   statistik dilihat langsung di dashboard analytics.google.com. */
 
 // INIT
 rPKGrid();rSum();
-trackVisit();
 </script>
 </body>
 </html>
