@@ -169,6 +169,11 @@ body{font-family:var(--font-b);background:var(--cream);color:var(--text);min-hei
 .vs-sh div h4{font-family:var(--font-d);font-size:.86rem;font-weight:600;}
 .vs-sh div p{font-size:.66rem;opacity:.6;margin-top:1px;}
 .vs-body{padding:13px 15px;}
+.vs-row{display:flex;gap:9px;}
+.vs-item{flex:1;text-align:center;padding:11px 6px;background:var(--gray-1);border-radius:var(--r);}
+.vs-num{font-family:var(--font-d);font-size:1.35rem;font-weight:700;color:var(--navy);line-height:1.1;}
+.vs-lbl{font-size:.6rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gray-3);margin-top:4px;}
+.vs-period{font-size:.68rem;color:var(--gray-4);margin-top:9px;text-align:center;}
 .vs-note{font-size:.62rem;color:var(--gray-3);margin-top:7px;text-align:center;line-height:1.5;}
 
 /* ── RESULT ── */
@@ -382,15 +387,19 @@ body{font-family:var(--font-b);background:var(--cream);color:var(--text);min-hei
         </div>
       </div>
 
-       <!-- VISITOR STATS CARD -->
-      <!--div class="card">
-        <div class="vs-sh"><span class="vsi">📊</span><div><h4>Statistik Kunjungan</h4><p>Google Analytics aktif</p></div></div>
+      <!-- VISITOR STATS CARD -->
+      <div class="card">
+        <div class="vs-sh"><span class="vsi">📊</span><div><h4>Statistik Kunjungan</h4><p>Live counter + Google Analytics</p></div></div>
         <div class="vs-body">
-          <div class="ib-green" style="margin-bottom:0;">✅ Pelacakan kunjungan aktif via Google Analytics 4.</div>
-          <div class="vs-note" style="text-align:left;margin-top:9px;">Untuk melihat jumlah kunjungan bulan ini, tahun ini, dan statistik lengkap lainnya, buka dashboard Google Analytics (perlu login dengan akun yang terdaftar).</div>
-          <a href="https://analytics.google.com/" target="_blank" rel="noopener" class="btn-sec" style="display:block;text-align:center;text-decoration:none;margin-top:11px;">📈 Buka Dashboard Analytics</a>
+          <div class="vs-row">
+            <div class="vs-item"><div class="vs-num" id="vc-month">—</div><div class="vs-lbl">Bulan Ini</div></div>
+            <div class="vs-item"><div class="vs-num" id="vc-year">—</div><div class="vs-lbl">Tahun Ini</div></div>
+          </div>
+          <div class="vs-period" id="vs-period">Memuat data...</div>
+          <div class="vs-note">Jumlah kunjungan (setiap halaman dimuat), bukan pengunjung unik.</div>
+          <a href="https://analytics.google.com/" target="_blank" rel="noopener" class="btn-sec" style="display:block;text-align:center;text-decoration:none;margin-top:11px;">📈 Laporan Lengkap di Analytics</a>
         </div>
-      </div-->
+      </div>
     </div>
   </div>
 </main>
@@ -753,12 +762,42 @@ function nb(step,last=false){return `<div class="nb"><button class="bn prev" onc
 function reset(){Object.assign(S,{step:1,pk:null,mt:'ecourt',nPG:1,nTG:1,nPM:1,nTM:1,tgs:[],tms:[],psR:'I',psX:0,exT:'riil'});rPKGrid();sM('ecourt');rSum();gS(1);}
 
 /* ══ STATISTIK KUNJUNGAN ══ */
-/* Pelacakan kunjungan kini ditangani otomatis oleh Google Analytics 4 (GA4)
-   lewat kode gtag.js di bagian <head>. Tidak perlu kode tambahan di sini —
-   statistik dilihat langsung di dashboard analytics.google.com. */
+/* Dua lapis pelacakan berjalan berdampingan:
+   1) Google Analytics 4 (gtag.js di <head>) — untuk laporan lengkap di dashboard.
+   2) Counter ringan (countapi.mileshilliard.com) — layanan gratis pihak ketiga
+      open-source (penerus countapi.xyz yang sudah tidak aktif), khusus untuk
+      menampilkan angka kunjungan LANGSUNG di halaman ini tanpa perlu login.
+   Kunci (key) counter dibuat otomatis mengikuti bulan & tahun berjalan, sehingga
+   angka "Bulan Ini" dan "Tahun Ini" otomatis mulai dari 0 saat periode baru mulai.
+   Catatan: layanan gratis pihak ketiga tanpa jaminan SLA — kalau suatu saat
+   berhenti, ganti nilai BASE di bawah dengan layanan pengganti sejenis. */
+async function trackVisit(){
+  const elMonth=document.getElementById('vc-month');
+  const elYear=document.getElementById('vc-year');
+  const elPeriod=document.getElementById('vs-period');
+  const BASE='https://countapi.mileshilliard.com/api/v1';
+  const KP='pnbaubau_w23u2_kalkulator_panjar'; // awalan key unik aplikasi ini
+  try{
+    const now=new Date();
+    const yyyy=now.getFullYear();
+    const mm=String(now.getMonth()+1).padStart(2,'0');
+    const [rYear,rMonth]=await Promise.all([
+      fetch(`${BASE}/hit/${KP}_tahun_${yyyy}`).then(r=>r.json()),
+      fetch(`${BASE}/hit/${KP}_bulan_${yyyy}_${mm}`).then(r=>r.json())
+    ]);
+    elMonth.textContent=(rMonth.value??0).toLocaleString('id-ID');
+    elYear.textContent=(rYear.value??0).toLocaleString('id-ID');
+    elPeriod.textContent=now.toLocaleDateString('id-ID',{month:'long',year:'numeric'})+' • Tahun '+yyyy;
+  }catch(e){
+    elMonth.textContent='N/A';
+    elYear.textContent='N/A';
+    elPeriod.textContent='Statistik tidak tersedia (periksa koneksi internet)';
+  }
+}
 
 // INIT
 rPKGrid();rSum();
+trackVisit();
 </script>
 </body>
 </html>
