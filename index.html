@@ -586,31 +586,45 @@ function calc(){
     if(ec){
       add('Panggilan Penggugat (E-Court)',0,'Panggilan');
       let pt=0,pm=0;
-      S.tgs.slice(0,n).forEach((t,i)=>{if(!t.lk){pt+=42000;pm+=28000;}else cat.push(`Tergugat ${i+1} luar kota — biaya Pos manual`);});
+      S.tgs.slice(0,n).forEach((t,i)=>{
+        if(!t.lk){
+          pt+=42000;
+          if(p==='gugatan') pm+=28000; // mediasi hanya utk gugatan
+        } else cat.push(`Tergugat ${i+1} luar kota — biaya Pos manual`);
+      });
       add(`Panggilan Tergugat ${n}× ×3 (E-Court)`,pt,'Panggilan',n>1);
-      add('Panggilan Mediasi Penggugat (E-Court)',0,'Panggilan');
-      add(`Panggilan Mediasi Tergugat ${n}× ×2 (E-Court)`,pm,'Panggilan',n>1);
+      if(p==='gugatan'){
+        add('Panggilan Mediasi Penggugat (E-Court)',0,'Panggilan');
+        add(`Panggilan Mediasi Tergugat ${n}× ×2 (E-Court)`,pm,'Panggilan',n>1);
+      }
     } else {
       let pt=0;S.tgs.slice(0,n).forEach(t=>{pt+=(t.lk?0:(KT[t.kel]||100000))*3;});
       add(`Panggilan Penggugat ${S.nPG}× ×3 (Radius)`,100000*3*S.nPG,'Panggilan',S.nPG>1);
       add(`Panggilan Tergugat ${n}× ×3 (Radius)`,pt,'Panggilan',n>1);
     }
-    add('Pendaftaran (PNBP)',30000,'PNBP');add('Redaksi (PNBP)',10000,'PNBP');
+    add('Pendaftaran (PNBP)',30000,'PNBP');
+    add('Redaksi (PNBP)',10000,'PNBP');
     add(`Panggilan Penggugat ${S.nPG}× (PNBP)`,10000*S.nPG,'PNBP',S.nPG>1);
     add(`Panggilan Tergugat ${n}× (PNBP)`,10000*n,'PNBP',n>1);
-    add(ec?'Pemberitahuan Putusan Penggugat (E-Court)':'Pemberitahuan Putusan Penggugat (PNBP)',ec?0:10000*S.nPG,'PNBP');
-    add(ec?'Pemberitahuan Putusan Tergugat (E-Court)':'Pemberitahuan Putusan Tergugat (PNBP)',ec?0:10000*n,'PNBP',n>1);
-    add('Pemeriksaan Setempat (PNBP)',10000,'PNBP');add('Materai Putusan',10000,'PNBP');add('Biaya ATK',100000,'Biaya Proses');
-    if(p==='konsinyasi'){add('PNBP Penetapan Penawaran',10000,'Konsinyasi');add('Biaya Jurusita (Penawaran)',300000,'Konsinyasi');add('Biaya 2 Saksi Penawaran (2×200.000)',400000,'Konsinyasi');add('Sewa Kendaraan',850000,'Konsinyasi');}
+    add('Pemberitahuan Putusan Penggugat (E-Court)',0,'PNBP');
+    add('Pemberitahuan Putusan Tergugat (E-Court)',0,'PNBP');
+    add(`Pemberitahuan Putusan Penggugat ${S.nPG}× (PNBP)`,10000*S.nPG,'PNBP',S.nPG>1);
+    add(`Pemberitahuan Putusan Tergugat ${n}× (PNBP)`,10000*n,'PNBP',n>1);
+    add('Pemeriksaan Setempat (PNBP)',10000,'PNBP');
+    add('Materai Putusan',10000,'PNBP');
+    add('Biaya ATK',100000,'Biaya Proses');
+    if(p==='konsinyasi'){add('PNBP Penetapan Penawaran',10000,'Konsinyasi');add('Biaya Jurusita (Penawaran)',150000,'Konsinyasi');add('Biaya 2 Saksi Penawaran (2×150.000)',300000,'Konsinyasi');add('Sewa Kendaraan',850000,'Konsinyasi');}
 
   } else if(p==='gugatan_sederhana'){
     const n=S.nTG;
     add('Penggugat (E-Court)',0,'Panggilan');
     add(`Tergugat ${n}× ×3 × Rp 14.000 (E-Court)`,42000*n,'Panggilan',n>1);
-    add('Pendaftaran (PNBP)',30000,'PNBP'); add('Redaksi',10000,'PNBP');add(`Panggilan Penggugat ${S.nPG}× (PNBP)`,10000*S.nPG,'PNBP',S.nPG>1);
+    add('Pendaftaran (PNBP)',30000,'PNBP'); add('Redaksi',10000,'PNBP');
+    add(`Panggilan Penggugat ${S.nPG}× (PNBP)`,10000*S.nPG,'PNBP',S.nPG>1);
     add(`Panggilan Tergugat ${n}× (PNBP)`,10000*n,'PNBP',n>1);
     add('Pemberitahuan Putusan Penggugat (E-Court)',10000,'PNBP');
-    add('Pemberitahuan Putusan Tergugat (E-Court)',10000,'PNBP');add('Materai Putusan',10000,'PNBP');add('Biaya ATK',100000,'Biaya Proses');
+    add('Pemberitahuan Putusan Tergugat (E-Court)',10000,'PNBP');
+    add('Materai Putusan',10000,'PNBP');add('Biaya ATK',100000,'Biaya Proses');
 
   } else if(p==='banding'){
     const np=S.nPG,nt=S.nTG;
@@ -632,12 +646,13 @@ function calc(){
     add(`Pemberitahuan Putusan Kasasi Pada Termohon Kasasi ${nt}×`,10000*nt,'PNBP',nt>1);
     add(`Inzage Pemohon Kasasi ${np}×`,10000*np,'PNBP',np>1);
     add(`Inzage Termohon Kasasi ${nt}×`,10000*nt,'PNBP',nt>1);
-    add('Biaya Kasasi',400000,'Biaya Upaya Hukum');
+    add('Biaya Kasasi',406500,'Biaya Upaya Hukum');
 
   } else if(p==='pk'){
     const np=S.nPG,nt=S.nTG,lk=S.tgs.some(t=>t.lk),pos=lk?0:14000;
     if(lk)cat.push('Pihak luar kota — biaya Pos manual');
     add(`Pemberitahuan Permohonan PK ${nt}× (Pos)`,14000*nt,'Pemberitahuan Pos',nt>1);
+    add(`Pemberitahuan panggilan sidang Novum ${nt}× (Pos)`,14000*nt,'Pemberitahuan Pos',nt>1);
     add(`Pemberitahuan Penyerahan Memori PK ${nt}× (Pos)`,14000*nt,'Pemberitahuan Pos',nt>1);
     add(`Pemberitahuan Penyerahan Kontra Memori PK  ${np}× (Pos)`,14000*np,'Pemberitahuan Pos',np>1);
     add(`Inzage PK Pemohon PK ${np}× (Pos)`,14000*np,'Pemberitahuan Pos',np>1);
@@ -653,7 +668,8 @@ function calc(){
     add(`Inzage Termohon PK ${nt}× (PNBP)`,10000*nt,'PNBP',nt>1);
     add(`Pemberitahuan Putusan PK pada Pemohon PK ${np}× (PNBP)`,10000*np,'PNBP',np>1);
     add(`Pemberitahuan Putusan PK pada Termohon PK ${nt}× (PNBP)`,10000*nt,'PNBP',nt>1);
-    add('Biaya PK',2000000,'Biaya Upaya Hukum');
+    add('Biaya PK + Biaya Kirim',2006500,'Biaya Upaya Hukum');
+    add('Biaya Surat Pemberitahuan pengiriman berkas PK',14000,'Biaya Upaya Hukum');
     
 
   } else if(p==='sita_jaminan'){
@@ -664,6 +680,7 @@ function calc(){
     add('Pemberitahuan ke Lurah/Kades',14000,'Pemberitahuan');
     add('Biaya Jurusita',150000,'Biaya Proses');
     add('Biaya 2 Saksi (2×150.000)',300000,'Biaya Proses');
+    add('Materai',10000,'Biaya Proses');
     add('Biaya Transportasi',850000,'Biaya Proses');
 
   } else if(p==='ps'){
@@ -695,6 +712,7 @@ function calc(){
     add(`Pemberitahuan Pelaksanaan pada Pemohon (Konstatering) ${np}×`,14000*np,'Pemberitahuan',np>1);
     add(`Pemberitahuan Pelaksanaan pada Termohon (Konstatering) ${nt}×`,14000*nt,'Pemberitahuan',nt>1);
     add('Pemberitahuan Pelaksanaan pada Lurah/Kades (Konstatering)',14000,'Pemberitahuan');
+    add('Pemberitahuan Pelaksanaan pada BPN (Konstatering)',14000,'Pemberitahuan');
     add('Biaya Lurah (Konstatering)',0,'Biaya Proses');
     add('Sewa Kendaraan (Konstatering)',850000,'Biaya Proses');
 
